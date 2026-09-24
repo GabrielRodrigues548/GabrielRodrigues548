@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulado de Inglês — E4</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --text:#1a2233; --muted:#5b667a;
+  --border:#e2e6ec; --primary:#2f6fed; --primary-d:#1f52c0;
+  --ok:#1e9e5a; --ok-bg:#e6f7ee; --err:#e0403a; --err-bg:#fdecea;
+  --chip:#eef2ff; --radius:16px;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12151c; --card:#1b2029; --text:#eef1f6; --muted:#9aa4b8;
+    --border:#2a3140; --primary:#5b8dff; --primary-d:#7ca2ff;
+    --ok:#3ddc84; --ok-bg:#123023; --err:#ff6b63; --err-bg:#3a1616;
+    --chip:#232a3a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12151c; --card:#1b2029; --text:#eef1f6; --muted:#9aa4b8;
+  --border:#2a3140; --primary:#5b8dff; --primary-d:#7ca2ff;
+  --ok:#3ddc84; --ok-bg:#123023; --err:#ff6b63; --err-bg:#3a1616;
+  --chip:#232a3a;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+*{box-sizing:border-box;}
+body{
+  margin:0; min-height:100%; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  display:flex; justify-content:center;
+}
+.wrap{width:100%; max-width:720px; padding:24px 16px 40px;}
+header{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:8px; flex-wrap:wrap;}
+h1{font-size:1.25rem; margin:0;}
+.sub{color:var(--muted); font-size:.85rem; margin-top:2px;}
+.top-actions{display:flex; gap:8px;}
+button{
+  font:inherit; cursor:pointer; border-radius:10px; border:1px solid var(--border);
+  background:var(--card); color:var(--text); padding:8px 14px;
+}
+button:hover{border-color:var(--primary);}
+.card{
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:22px; overflow-x:auto;
+}
+.progress-bar{height:8px; background:var(--chip); border-radius:999px; overflow:hidden; margin-bottom:18px;}
+.progress-fill{height:100%; background:var(--primary); transition:width .25s ease; width:0%;}
+.tag{
+  display:inline-block; background:var(--chip); color:var(--primary-d); font-size:.72rem;
+  font-weight:600; padding:4px 10px; border-radius:999px; margin-bottom:12px; letter-spacing:.02em;
+}
+.qnum{color:var(--muted); font-size:.85rem; margin-bottom:6px;}
+.question{font-size:1.08rem; font-weight:600; line-height:1.45; margin:0 0 18px;}
+.options{display:flex; flex-direction:column; gap:10px;}
+.opt{
+  text-align:left; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+  background:var(--card); color:var(--text); font-size:.98rem; line-height:1.4; width:100%;
+  display:flex; align-items:center; gap:10px;
+}
+.opt .letter{
+  flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:var(--chip);
+  display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; color:var(--primary-d);
+}
+.opt:hover:not(:disabled){border-color:var(--primary);}
+.opt.correct{background:var(--ok-bg); border-color:var(--ok); color:var(--ok);}
+.opt.correct .letter{background:var(--ok); color:#fff;}
+.opt.wrong{background:var(--err-bg); border-color:var(--err); color:var(--err);}
+.opt.wrong .letter{background:var(--err); color:#fff;}
+.opt:disabled{cursor:default; opacity:.9;}
+.feedback{
+  margin-top:16px; padding:14px 16px; border-radius:12px; font-size:.92rem; line-height:1.5;
+  display:none;
+}
+.feedback.show{display:block;}
+.feedback.ok{background:var(--ok-bg); color:var(--ok);}
+.feedback.err{background:var(--err-bg); color:var(--err);}
+.feedback b{display:block; margin-bottom:4px; font-size:.95rem;}
+.nav{display:flex; justify-content:space-between; align-items:center; margin-top:22px; gap:10px;}
+.nav button{padding:10px 18px; font-weight:600;}
+.nav button.primary{background:var(--primary); color:#fff; border-color:var(--primary);}
+.nav button.primary:hover{background:var(--primary-d);}
+.nav button:disabled{opacity:.4; cursor:not-allowed;}
+.hidden{display:none !important;}
+
+/* results screen */
+.score-hero{text-align:center; padding:6px 0 22px;}
+.score-num{font-size:3rem; font-weight:800; color:var(--primary);}
+.score-label{color:var(--muted); font-size:.95rem;}
+.bar-row{display:flex; align-items:center; gap:10px; margin:10px 0;}
+.bar-row .name{flex:0 0 150px; font-size:.85rem; color:var(--muted);}
+.bar-track{flex:1; height:10px; background:var(--chip); border-radius:999px; overflow:hidden;}
+.bar-fill{height:100%; background:var(--primary); border-radius:999px;}
+.bar-pct{flex:0 0 42px; text-align:right; font-size:.82rem; color:var(--muted);}
+.tips{margin-top:20px; padding:16px; background:var(--chip); border-radius:12px; font-size:.92rem; line-height:1.6;}
+.tips h3{margin:0 0 8px; font-size:.95rem;}
+.review-item{border-top:1px solid var(--border); padding:14px 0;}
+.review-item .q{font-weight:600; margin-bottom:6px; font-size:.95rem;}
+.review-item .yourans{font-size:.88rem; margin-bottom:2px;}
+.review-item .expl{font-size:.85rem; color:var(--muted); margin-top:4px;}
+.pill-ok{color:var(--ok); font-weight:700;}
+.pill-err{color:var(--err); font-weight:700;}
+.final-actions{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap;}
+.final-actions button{flex:1; min-width:160px; padding:12px; font-weight:600;}
+footer{text-align:center; color:var(--muted); font-size:.75rem; margin-top:18px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Simulado — Inglês E4</h1>
+      <div class="sub" id="headerSub">Unidades 1 e 2 · American English File</div>
+    </div>
+    <div class="top-actions">
+      <button id="themeBtn" title="Alternar tema">🌓</button>
+      <button id="downloadBtn" title="Salvar página em HTML">⬇ Salvar</button>
+    </div>
+  </header>
+
+  <div class="card" id="quizCard">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="tag" id="qTag"></div>
+    <div class="qnum" id="qNum"></div>
+    <div class="question" id="qText"></div>
+    <div class="options" id="qOptions"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="nav">
+      <button id="backBtn">← Voltar</button>
+      <button id="nextBtn" class="primary" disabled>Próxima →</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <div class="score-hero">
+      <div class="score-num" id="scorePct">0%</div>
+      <div class="score-label" id="scoreLabel">0 de 30 corretas</div>
+    </div>
+    <div id="categoryBars"></div>
+    <div class="tips" id="tipsBox"></div>
+    <div id="reviewList"></div>
+    <div class="final-actions">
+      <button id="restartBtn">🔁 Refazer simulado</button>
+      <button id="downloadBtn2">⬇ Salvar página em HTML</button>
+    </div>
+  </div>
+
+  <footer>Baseado no conteúdo revisado das Unidades 1 e 2 (Clothes, Prepositions, Present tenses, Vacations, Past tenses, Connectors, Reading, Describing people).</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+  // Simple Present x Present Continuous
+  {cat:"Present Simple x Continuous", q:"Right now, Daniel is helping his uncle in the café. Complete: \"I ______ (help) my uncle right now, so I ______ (not attend) classes this week.\"",
+   opts:["help / don't attend","am helping / am not attending","helped / didn't attend","am helping / don't attend"], correct:1,
+   expl:"A ação está acontecendo agora e a semana atual é temporária, então os dois verbos vão para o Present Continuous: 'am helping' e 'am not attending'."},
+  {cat:"Present Simple x Continuous", q:"Daniel diz: \"I ______ (not understand) French very well, so I ______ (take) an online course these days.\"",
+   opts:["don't understand / am taking","am not understanding / take","don't understand / take","didn't understand / am taking"], correct:0,
+   expl:"'Understand' é um verbo de estado (não aceita continuous), por isso fica no Present Simple. 'Take a course' descreve algo temporário acontecendo agora, por isso vai para o Present Continuous."},
+  {cat:"Present Simple x Continuous", q:"\"______ you ______ (study) any languages at the moment?\"",
+   opts:["Do / study","Are / studying","Did / study","Were / studying"], correct:1,
+   expl:"'At the moment' indica uma ação em progresso no período atual, então usamos Present Continuous: 'Are you studying...?'."},
+  {cat:"Present Simple x Continuous", q:"Sophie geralmente prefere música a arte, mas neste mês ela está lendo mais sobre pintura. Complete: \"Sophie usually ______ (prefer) music, but this month she ______ (read) about painting.\"",
+   opts:["prefers / reads","is preferring / is reading","prefers / is reading","prefer / is reading"], correct:2,
+   expl:"'Prefer' é verbo de estado, então fica no Simple Present ('prefers'). 'This month' indica uma ação temporária em andamento, então usamos Present Continuous ('is reading')."},
+
+  // Past Simple x Past Continuous
+  {cat:"Past Simple x Continuous", q:"\"It ______ (not/rain) when we left the house yesterday morning.\"",
+   opts:["didn't rain","wasn't raining","doesn't rain","isn't raining"], correct:1,
+   expl:"A chuva seria uma ação em progresso no momento em que 'we left the house' aconteceu, então usamos Past Continuous: 'wasn't raining'."},
+  {cat:"Past Simple x Continuous", q:"\"When ______ he ______ (buy) his first car?\"",
+   opts:["did / buy","was / buying","does / buy","is / buying"], correct:0,
+   expl:"É uma pergunta sobre uma ação pontual e concluída no passado, então usamos Simple Past com o auxiliar 'did': 'When did he buy...?'."},
+  {cat:"Past Simple x Continuous", q:"\"I ______ (sleep) when my sister arrived home last night.\"",
+   opts:["slept","was sleeping","sleep","am sleeping"], correct:1,
+   expl:"'Was sleeping' descreve a ação em andamento (dormir) que foi interrompida pela ação pontual 'arrived' (Simple Past)."},
+  {cat:"Past Simple x Continuous", q:"\"What ______ you ______ (do) at eight o'clock yesterday evening?\"",
+   opts:["did / do","were / doing","do / do","are / doing"], correct:1,
+   expl:"Perguntamos sobre uma ação em progresso em um momento específico do passado (8h de ontem), por isso usamos Past Continuous: 'were you doing'."},
+
+  // Connectors
+  {cat:"Connectors", q:"\"Camila doesn't drink coffee ______ it makes her nervous.\"",
+   opts:["although","because","but","so"], correct:1,
+   expl:"'Because' introduz a razão/causa (o motivo de ela não beber café)."},
+  {cat:"Connectors", q:"\"______ the hotel was very cheap, the rooms were clean and comfortable.\"",
+   opts:["Although","Because","So","But"], correct:0,
+   expl:"'Although' liga duas ideias contrastantes no início da frase (barato, mas mesmo assim limpo e confortável — o contraste é inesperado)."},
+  {cat:"Connectors", q:"\"The weather was terrible, ______ we stayed at home all weekend.\"",
+   opts:["so","because","although","but"], correct:0,
+   expl:"'So' introduz a consequência (o tempo ruim causou a decisão de ficar em casa)."},
+
+  // Clothes vocabulary
+  {cat:"Clothes", q:"Como se chama a joia que se usa ao redor do pulso?",
+   opts:["a ring","a scarf","a bracelet","gloves"], correct:2,
+   expl:"'A bracelet' é a pulseira, usada no pulso. 'A ring' é anel (dedo), 'a scarf' é cachecol (pescoço) e 'gloves' são luvas (mãos)."},
+  {cat:"Clothes", q:"Um conjunto formal de roupas que homens costumam usar no trabalho ou em um casamento é:",
+   opts:["a tracksuit","a coat","a suit","a cap"], correct:2,
+   expl:"'A suit' é o terno, roupa formal. 'A tracksuit' é agasalho esportivo, 'a coat' é casaco e 'a cap' é boné."},
+  {cat:"Clothes", q:"Roupas confortáveis usadas para praticar esportes são chamadas de:",
+   opts:["tights","a tracksuit","boots","a suit"], correct:1,
+   expl:"'A tracksuit' é o agasalho esportivo. 'Tights' são meia-calça/collant, 'boots' são botas e 'a suit' é terno formal."},
+
+  // Prepositions of place
+  {cat:"Prepositions of place", q:"\"There's a small garden ______ the school.\" (o jardim fica na parte de trás)",
+   opts:["in front of","behind","between","on"], correct:1,
+   expl:"'Behind' significa 'atrás de', indicando que o jardim está na parte de trás da escola."},
+  {cat:"Prepositions of place", q:"\"The bank is the building ______ the post office and the bakery.\" (o banco fica no meio dos dois)",
+   opts:["near","between","behind","on the left"], correct:1,
+   expl:"'Between' é usado quando algo está no meio de duas coisas, exatamente como o banco entre o correio e a padaria."},
+  {cat:"Prepositions of place", q:"\"Who's the woman standing ______ your father in this photo?\" (ela está do lado direito dele)",
+   opts:["under","behind","on the right of","in front of"], correct:2,
+   expl:"'On the right of' indica posição à direita de alguém na foto."},
+
+  // Vacations vocabulary
+  {cat:"Vacations vocabulary", q:"Se você precisa de permissão oficial para trabalhar em outro país, você precisa de:",
+   opts:["a ticket","a visa","a reservation","a passport photo"], correct:1,
+   expl:"'A visa' é o visto, documento que autoriza trabalho ou permanência em outro país."},
+  {cat:"Vacations vocabulary", q:"\"The hotel room was small, but it was very ______.\" (era aconchegante e agradável)",
+   opts:["crowded","delicious","comfortable","foggy"], correct:2,
+   expl:"'Comfortable' descreve um ambiente agradável para ficar, mesmo sendo pequeno."},
+  {cat:"Vacations vocabulary", q:"\"We couldn't see the mountains because it was very ______ that morning.\" (não dava para enxergar longe)",
+   opts:["sunny","hot","foggy","windy"], correct:2,
+   expl:"'Foggy' (com neblina) explica por que a visibilidade estava ruim."},
+  {cat:"Vacations vocabulary", q:"\"We ______ a car for the whole week in Portugal.\" (pagamos para usar temporariamente)",
+   opts:["booked","bought","hired","spent"], correct:2,
+   expl:"'Hired a car' significa alugar um carro. 'Booked' é reservar (hotel/voo), 'bought' é comprar em definitivo."},
+
+  // at, in, on
+  {cat:"Prepositions: at / in / on", q:"\"What are you going to do ______ Saturday night?\"",
+   opts:["at","in","on","—"], correct:2,
+   expl:"Usamos 'on' com dias da semana e partes específicas deles, como 'on Saturday night'."},
+  {cat:"Prepositions: at / in / on", q:"\"There were no free seats ______ the bus.\"",
+   opts:["at","in","on","—"], correct:2,
+   expl:"Usamos 'on' para meios de transporte públicos como ônibus, trem e avião: 'on the bus'."},
+  {cat:"Prepositions: at / in / on", q:"\"They usually go running ______ the evening.\"",
+   opts:["at","in","on","—"], correct:1,
+   expl:"Usamos 'in' com partes do dia (morning, afternoon, evening): 'in the evening'."},
+  {cat:"Prepositions: at / in / on", q:"\"The movie starts ______ 8:30 p.m.\"",
+   opts:["at","in","on","—"], correct:0,
+   expl:"Usamos 'at' com horários específicos: 'at 8:30 p.m.'."},
+
+  // Reading comprehension (Cusco)
+  {cat:"Reading comprehension", q:"No texto sobre o mercado de Cusco, o que a autora estava fazendo quando encontrou o artigo sobre a cidade?",
+   opts:["Ela estava fazendo compras de lembranças","Ela estava lendo um blog de viagens","Ela estava conversando com uma amiga","Ela estava arrumando a mochila"], correct:1,
+   expl:"O texto diz que ela leu o artigo em um blog de viagens ('travel blog') uma noite, antes da viagem."},
+  {cat:"Reading comprehension", q:"Por que a autora não gostou das lembranças que comprou no primeiro dia no mercado?",
+   opts:["Eram muito caras","Eram bonitas, mas não tinham nenhuma história ou significado para ela","Ela não gostou das cores","O vendedor foi rude com ela"], correct:1,
+   expl:"O texto explica que os objetos eram bonitos, mas não significavam nada para ela — faltava a história por trás deles."},
+  {cat:"Reading comprehension", q:"O que a autora fez de diferente no segundo dia no mercado?",
+   opts:["Foi mais tarde e comprou mais coisas","Chegou bem cedo e conversou com os vendedores em vez de só fotografar","Ficou no hotel o dia todo","Levou uma amiga para traduzir"], correct:1,
+   expl:"No segundo dia ela chegou cedo, antes dos ônibus de turismo, e conversou com os vendedores, ouvindo as histórias por trás dos objetos."},
+
+  // Describing people
+  {cat:"Describing people", q:"Uma pessoa aberta, calorosa e fácil de conversar é descrita como:",
+   opts:["shy","serious","friendly","lazy"], correct:2,
+   expl:"'Friendly' descreve alguém aberto e caloroso, fácil de se aproximar e conversar."},
+  {cat:"Describing people", q:"Qual é o oposto de 'generous' (generoso)?",
+   opts:["kind","cheap","talkative","hardworking"], correct:1,
+   expl:"'Cheap', nesse contexto de personalidade, significa 'pão-duro' — o oposto de generoso."}
+];
+
+const total = QUESTIONS.length;
+let current = 0;
+let answers = new Array(total).fill(null); // stores chosen index or null
+
+const qTag = document.getElementById('qTag');
+const qNum = document.getElementById('qNum');
+const qText = document.getElementById('qText');
+const qOptions = document.getElementById('qOptions');
+const feedback = document.getElementById('feedback');
+const backBtn = document.getElementById('backBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progressFill = document.getElementById('progressFill');
+const quizCard = document.getElementById('quizCard');
+const resultCard = document.getElementById('resultCard');
+
+function renderQuestion(){
+  const item = QUESTIONS[current];
+  qTag.textContent = item.cat;
+  qNum.textContent = 'Pergunta ' + (current+1) + ' de ' + total;
+  qText.textContent = item.q;
+  qOptions.innerHTML = '';
+  feedback.className = 'feedback';
+  feedback.textContent = '';
+  progressFill.style.width = ((current)/total*100) + '%';
+
+  const chosen = answers[current];
+  const letters = ['A','B','C','D'];
+
+  item.opts.forEach((optText, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = '<span class="letter">'+letters[idx]+'</span><span>'+optText+'</span>';
+    if(chosen !== null){
+      btn.disabled = true;
+      if(idx === item.correct) btn.classList.add('correct');
+      else if(idx === chosen) btn.classList.add('wrong');
+    } else {
+      btn.addEventListener('click', () => selectAnswer(idx));
+    }
+    qOptions.appendChild(btn);
+  });
+
+  if(chosen !== null){
+    showFeedback(chosen === item.correct, item.expl, item.correct, item.opts);
+    nextBtn.disabled = false;
+  } else {
+    nextBtn.disabled = true;
+  }
+
+  backBtn.disabled = current === 0;
+  nextBtn.textContent = current === total - 1 ? 'Ver resultado →' : 'Próxima →';
+}
+
+function showFeedback(isCorrect, expl, correctIdx, opts){
+  feedback.classList.add('show', isCorrect ? 'ok' : 'err');
+  const letters = ['A','B','C','D'];
+  feedback.innerHTML = '<b>' + (isCorrect ? '✅ Correto!' : '❌ Incorreto — resposta certa: ' + letters[correctIdx] + ') ' + opts[correctIdx]) + '</b>' + expl;
+}
+
+function selectAnswer(idx){
+  answers[current] = idx;
+  renderQuestion();
+}
+
+backBtn.addEventListener('click', () => {
+  if(current > 0){ current--; renderQuestion(); }
+});
+
+nextBtn.addEventListener('click', () => {
+  if(current < total - 1){ current++; renderQuestion(); }
+  else { showResults(); }
+});
+
+function showResults(){
+  quizCard.classList.add('hidden');
+  resultCard.classList.remove('hidden');
+
+  let correctCount = 0;
+  const byCat = {};
+  QUESTIONS.forEach((item, i) => {
+    const isCorrect = answers[i] === item.correct;
+    if(isCorrect) correctCount++;
+    if(!byCat[item.cat]) byCat[item.cat] = {correct:0, total:0};
+    byCat[item.cat].total++;
+    if(isCorrect) byCat[item.cat].correct++;
+  });
+
+  const pct = Math.round((correctCount/total)*100);
+  document.getElementById('scorePct').textContent = pct + '%';
+  document.getElementById('scoreLabel').textContent = correctCount + ' de ' + total + ' corretas';
+
+  const catBox = document.getElementById('categoryBars');
+  catBox.innerHTML = '';
+  const weak = [];
+  Object.keys(byCat).forEach(cat => {
+    const d = byCat[cat];
+    const p = Math.round((d.correct/d.total)*100);
+    if(p < 70) weak.push(cat);
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = '<div class="name">'+cat+'</div><div class="bar-track"><div class="bar-fill" style="width:'+p+'%"></div></div><div class="bar-pct">'+p+'%</div>';
+    catBox.appendChild(row);
+  });
+
+  const tipsBox = document.getElementById('tipsBox');
+  let tipsHtml = '<h3>Como melhorar</h3>';
+  if(weak.length === 0){
+    tipsHtml += 'Ótimo desempenho em todas as áreas! Revise os itens que errou individualmente e refaça o simulado em alguns dias para fixar o conteúdo.';
+  } else {
+    tipsHtml += 'Áreas para reforçar: <b>' + weak.join(', ') + '</b>. Sugestões:<ul style="margin:8px 0 0 18px; padding:0;">';
+    weak.forEach(cat => tipsHtml += '<li>'+ tipForCategory(cat) +'</li>');
+    tipsHtml += '</ul>';
+  }
+  tipsBox.innerHTML = tipsHtml;
+
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = '<h3 style="margin-top:24px;">Revisão detalhada</h3>';
+  const letters = ['A','B','C','D'];
+  QUESTIONS.forEach((item, i) => {
+    const isCorrect = answers[i] === item.correct;
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    const yourAnsText = answers[i] === null ? 'Não respondida' : letters[answers[i]] + ') ' + item.opts[answers[i]];
+    div.innerHTML =
+      '<div class="q">'+(i+1)+'. '+item.q+'</div>'+
+      '<div class="yourans">Sua resposta: <span class="'+(isCorrect?'pill-ok':'pill-err')+'">'+yourAnsText+'</span>'+
+      (isCorrect ? '' : ' — correta: ' + letters[item.correct] + ') ' + item.opts[item.correct]) + '</div>'+
+      '<div class="expl">'+item.expl+'</div>';
+    reviewList.appendChild(div);
+  });
+
+  progressFill.style.width = '100%';
+}
+
+function tipForCategory(cat){
+  const tips = {
+    "Present Simple x Continuous": "Revise verbos de estado (like, understand, prefer, want) que não aceitam continuous, e pratique identificar palavras-chave como 'now', 'at the moment', 'these days'.",
+    "Past Simple x Continuous": "Pratique frases com 'when' e 'while': a ação mais longa (interrompida) fica no Past Continuous, e a ação pontual fica no Simple Past.",
+    "Connectors": "Revise a diferença entre causa (because), consequência (so) e contraste (although/but) com frases do seu dia a dia.",
+    "Clothes": "Refaça o exercício de associar peças de roupa com suas definições, cobrindo as palavras e tentando lembrar sozinho.",
+    "Prepositions of place": "Desenhe um mapa simples e pratique descrever posições (behind, in front of, between, on the right of) em voz alta.",
+    "Vacations vocabulary": "Releia o vocabulário de férias e crie frases próprias usando visa, comfortable, foggy e hire.",
+    "Prepositions: at / in / on": "Memorize os padrões: 'at' + horário exato, 'in' + partes do dia/meses, 'on' + dias da semana e meios de transporte público.",
+    "Reading comprehension": "Pratique ler o texto uma vez rápido para ideia geral e depois reler procurando detalhes específicos das perguntas.",
+    "Describing people": "Revise a lista de adjetivos de personalidade e seus opostos, tentando usá-los em frases sobre pessoas que você conhece."
+  };
+  return tips[cat] || "Revise o conteúdo dessa seção no material da aula.";
+}
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  current = 0;
+  answers = new Array(total).fill(null);
+  resultCard.classList.add('hidden');
+  quizCard.classList.remove('hidden');
+  renderQuestion();
+});
+
+// Theme toggle
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.addEventListener('click', () => {
+  const root = document.documentElement;
+  const current = root.getAttribute('data-theme');
+  if(current === 'dark'){ root.setAttribute('data-theme','light'); }
+  else if(current === 'light'){ root.removeAttribute('data-theme'); }
+  else { root.setAttribute('data-theme','dark'); }
+});
+
+// Download / Save page as HTML
+async function savePage(){
+  const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const filename = 'simulado-ingles-e4.html';
+  try{
+    if(window.claude && typeof window.claude.use === 'function'){
+      const downloads = await window.claude.use('downloads');
+      if(downloads){
+        await downloads.save({filename, data: htmlContent});
+        return;
+      }
+    }
+  }catch(e){ /* fall through to browser download */ }
+
+  try{
+    const blob = new Blob([htmlContent], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(e){
+    alert('Não foi possível salvar automaticamente. Use Ctrl+S (ou Cmd+S) para salvar esta página.');
+  }
+}
+document.getElementById('downloadBtn').addEventListener('click', savePage);
+document.getElementById('downloadBtn2').addEventListener('click', savePage);
+
+renderQuestion();
+</script>
+</body>
+</html>
